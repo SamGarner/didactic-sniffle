@@ -9,17 +9,20 @@
 
 # Game - initializes new game and game loop
 class Game
+  attr_accessor :board
+  
   def initialize(codebreaker = 'human', codemaker = 'computer')
     @codebreaker = Player.new('human')#(codebreaker)
     puts "yes"
     @codemaker = Player.new('computer')#(codemaker)
     puts "yes2"
     @board = Board.new
-    @board.guess_counter = 12 #remaining guesses
+    #@board.guess_counter = 12 #remaining guesses
   end
 
   def game_loop
     @game_over = 0
+    @board.guess_counter = 12
     while @board.guess_counter > 0
       @board.display_last_guess unless @board.guess_counter == 12   
       @codebreaker.guess_secret_code
@@ -27,6 +30,11 @@ class Game
         puts 'invalid guess...please try again'
         next
       else
+        puts 'made it'
+        puts @codebreaker.inspect
+        puts @board.inspect
+        puts @board.guess_counter.inspect
+        puts 'huzzah'
         @codebreaker.add_guess_to_board
         @codebreaker.reset_correct_count
         @codebreaker.count_exact_matches
@@ -45,7 +53,7 @@ class Board
   def initialize
     @board_array = Array.new(12) { Array.new(4) }
     @colors = ['green', 'blue', 'yellow', 'white', 'black', 'pink']
-    # if codemaker is computer, generate secret code
+    @guess_counter = 12 # if codemaker is computer, generate secret code
     #@codemaker.player_type == 'computer' ? generate_secret_code : nil # update this to 
                                               # ask for human input code for v2
   end
@@ -106,10 +114,12 @@ class Player
   end
 
   def add_guess_to_board
-    @guess_row = 13 - @board.guess_counter
-    (0..3).each do |n|
-      @board_array[@guess_row][n] = @new_guess_array[n]
-    end
+    puts @board.inspect
+    puts 'weird'
+    # @guess_row = 13 - @board.guess_counter
+    # (0..3).each do |n|
+    #   @board_array[@guess_row][n] = @new_guess_array[n]
+    # end
   end
 
   def count_exact_matches
