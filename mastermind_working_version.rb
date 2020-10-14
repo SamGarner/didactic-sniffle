@@ -90,18 +90,14 @@ class Board
   end
 
   def reset_remaining_indices_to_check
-    @remaining_guess_indices = [0, 1, 2, 3]
-    @remaining_code_indices = [0, 1, 2, 3]
+    @remaining_indices = [0, 1, 2, 3]
   end
 
   def check_exact_matches
     (0..3).each do |n|
       if @board_array[@row_for_guess][n] == @board_array[0][n]
         @exact_match_count += 1
-        @remaining_guess_indices.delete(n)
-        @remaining_code_indices.delete(n)
-        # @matched_guess_indices << n
-        # @matched_code_indices << n
+        @remaining_indices.delete(n)
       end
     end
   end
@@ -114,12 +110,11 @@ class Board
   def check_color_only_remaining_matches#(guess_array) # try it with the indices and not colors
     @code_copy = @board_array[0].dup
     @guess_copy = @board_array[@row_for_guess].dup
-    @remaining_guess_indices.each do |n|
-      @remaining_code_indices.each do |j|
+    @remaining_indices.each do |n|
+      @remaining_indices.each do |j|
         if @guess_copy[n] == @code_copy[j]
           @color_only_match_count += 1
-          #@guess_array[n] = ''
-          @guess_copy[n] = '' # [n]????
+          @guess_copy[n] = ''
           @code_copy[j] = '-'
         end
       end
