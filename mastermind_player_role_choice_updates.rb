@@ -9,11 +9,31 @@
 
 # Game - initializes new game and game loop
 class Game
+  def get_player_role
+    while 1
+      puts "Enter which role you would like to play: 'codebreaker' or 'codemaker':\n"
+      @player = gets.chomp
+      ['codemaker', 'codebreaker'].include?(@player) ? break : 'Invalid input, try again:'
+    end
+  end
+
+  def identify_player_types
+    if @role == 'codebreaker'
+      @codebreaker_type = 'human'
+      @codemaker_type = 'computer'
+    else
+      @codebreaker_type = 'computer'
+      @codemaker_type = 'human'
+    end
+  end
+
   def initialize
     @board = Board.new
-    @codebreaker = Player.new('human', @board)
-    @codemaker = Player.new('computer', @board)
-    @board.generate_secret_code # DEFINE for player to switch roles??
+    get_player_role
+    identify_player_types
+    @codebreaker = Player.new(@codebreaker_type, @board)
+    @codemaker = Player.new(@codemaker_type, @board)
+    @board.generate_secret_code unless @codemaker_type == 'human' # DEFINE for player to switch roles??
     @guess_counter = 12
     @game_over = 0
   end
@@ -23,20 +43,14 @@ class Game
   end
 
   def display_number_of_remaining_turns
-    if @guess_counter > 0 
-      puts "#{@guess_counter} turns left... Try again!"
-    else
-      puts "#{@guess_counter} turns left... Game over!"
-    end
+    puts "#{@guess_counter} turns left... Try again!"
   end
 
   def play
-    while @guess_counter > 0 #@game_over.zero?  #noted   
+    while @game_over.zero?  #noted   
       @board.display_last_guess unless @guess_counter == 12
       @codebreaker.guess_secret_code
       puts 'Invalid guess format, please try again' unless
-        @board.valid_guess?(@codebreaker.new_guess_array)
-      next unless
         @board.valid_guess?(@codebreaker.new_guess_array)
       @board.add_guess_to_board(@guess_counter, @codebreaker.new_guess_array)
       @board.reset_match_calculators
@@ -45,13 +59,16 @@ class Game
       @board.check_color_only_remaining_matches
       @board.display_guess_results
       if @board.exact_match_count == 4
-        @guess_counter = 0
+        @game_over = 1
         next
       else
         @guess_counter -= 1
       end
       display_number_of_remaining_turns
     end
+  end
+
+  def play_as_codemaster
   end
 end
 
@@ -78,7 +95,6 @@ class Board
   end
 
   def display_last_guess
-    puts 'Your last valid guess was:'
     puts @board_array[@row_for_guess]
   end
 
@@ -119,7 +135,7 @@ class Board
         if @guess_copy[n] == @code_copy[j]
           @color_only_match_count += 1
           #@guess_array[n] = ''
-          @guess_copy = '' # [n]????
+          @guess_copy = ''
           @code_copy[j] = '-'
         end
       end
@@ -128,11 +144,11 @@ class Board
 
   def display_guess_results
     ## troubleshooting inspect, remove
-    puts @board_array[0].inspect
+    # puts @board_array[0].inspect
     ##
     if @exact_match_count == 4
-      puts "\nCongrats - you cracked the code!\n"
-    else
+      puts "\mCongrats - you cracked the code!\n'
+    else 
       puts "#{@exact_match_count} exact matches and #{@color_only_match_count} other color only matches"
     end
   end
@@ -164,8 +180,7 @@ class Player
   end
 
   def guess_secret_code
-    puts 'choose four colors (green, blue, yellow, white, black, pink - duplicates OK)'\
-    ' separated by spaces to guess the code:'
+    puts 'enter four colors (duplicates OK) separated by spaces to guess the code:'
     @new_guess_array = gets.chomp.downcase.split()#gsub(' ','').split(',')
   end
 
@@ -194,6 +209,3 @@ game.play
 # .include? returns true if the given object is present in the array
 # using .dup to copy an array before manipulating it, otherwise pointing at same space in memory and will mutate both
 # game_over.zero? preferred to game_over == 0
-# multiline string example:
-#     puts 'choose four colors (green, blue, yellow, white, black, pink - duplicates OK)'\
-#     ' separated by spaces to guess the code:'
