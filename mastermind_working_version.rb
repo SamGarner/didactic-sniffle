@@ -39,8 +39,9 @@ class Game
         @board.valid_guess?(@codebreaker.new_guess_array)
       @board.add_guess_to_board(@guess_counter, @codebreaker.new_guess_array)
       @board.reset_match_calculators
+      @board.reset_remaining_indices_to_check ###
       @board.check_exact_matches
-      @board.get_remaining_indices_to_check
+      #@board.get_remaining_indices_to_check
       @board.check_color_only_remaining_matches
       @board.display_guess_results
       if @board.exact_match_count == 4
@@ -88,26 +89,26 @@ class Board
     @matched_code_indices = []
   end
 
-  def check_exact_matches#(guess_array)
-    (0..3).each do |n| 
-      #if guess_array[n] == @board_array[0][n]
+  def reset_remaining_indices_to_check
+    @remaining_guess_indices = [0, 1, 2, 3]
+    @remaining_code_indices = [0, 1, 2, 3]
+  end
+
+  def check_exact_matches
+    (0..3).each do |n|
       if @board_array[@row_for_guess][n] == @board_array[0][n]
         @exact_match_count += 1
-        @matched_guess_indices << n
-        @matched_code_indices << n 
+        @remaining_guess_indices.delete(n)
+        @remaining_code_indices.delete(n)
+        # @matched_guess_indices << n
+        # @matched_code_indices << n
       end
     end
   end
 
-  def get_remaining_indices_to_check
-    @remaining_guess_indices = (0..3).reject { |n| @matched_guess_indices.include?(n) }
-    @remaining_code_indices = (0..3).reject { |n| @matched_code_indices.include?(n) }
-  end
-  # def get_remaining_colors_to_check#(guess_array)
-  #   @guess_colors_to_check = Array.new
-  #   @guess_colors_to_check << @remaining_guess_indices.each { |n| @board_array[@row_for_guess][n] }
-  #   @code_colors_to_check = Array.new
-  #   @code_colors_to_check << @remaining_code_indices.each { |n| @board_array[0][n] }
+  # def get_remaining_indices_to_check
+  #   @remaining_guess_indices = (0..3).reject { |n| @matched_guess_indices.include?(n) }
+  #   @remaining_code_indices = (0..3).reject { |n| @matched_code_indices.include?(n) }
   # end
 
   def check_color_only_remaining_matches#(guess_array) # try it with the indices and not colors
@@ -118,7 +119,7 @@ class Board
         if @guess_copy[n] == @code_copy[j]
           @color_only_match_count += 1
           #@guess_array[n] = ''
-          @guess_copy = '' # [n]????
+          @guess_copy[n] = '' # [n]????
           @code_copy[j] = '-'
         end
       end
@@ -194,8 +195,21 @@ game.play
 # when have nested arrays: Board[0] gives first array, Board[0][1] gives second element of first array
 # .include? returns true if the given object is present in the array
 # using .dup to copy an array before manipulating it, otherwise pointing at same space in memory and will mutate both
-# game_over.zero? preferred to game_over == 0
+# game_over.zero? preferred to game_over == 0 ?
 # multiline string example:
 #     puts 'choose four colors (green, blue, yellow, white, black, pink - duplicates OK)'\
 #     ' separated by spaces to guess the code:'
 # @board_array = Array.new(12) { Array.new(4) }  --> makes an array of 12 (sub)arrays of 4
+# reject example (removed with refactoring, see screenshot)
+      # def check_exact_matches
+      #   (0..3).each do |n|
+      #     if @board_array[@row_for_guess][n] == @board_array[0][n]
+      #       @exact_match_count += 1
+      #       @matched_guess_indices << n
+      #       @matched_code_indices << n
+      #     end
+      #   end
+      # end
+
+      # def get_remaining_indices_to_check
+      #   @remaining_guess_indices = (0..3).reject { |n| @matched_guess_indices.include?(n) }
