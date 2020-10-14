@@ -15,7 +15,6 @@ class Game
     @codemaker = Player.new('computer', @board)
     @board.generate_secret_code # DEFINE for player to switch roles??
     @guess_counter = 12
-    @game_over = 0
   end
 
   def reduce_remaining_guess_counter
@@ -24,9 +23,9 @@ class Game
 
   def display_number_of_remaining_turns
     if @guess_counter > 0 
-      puts "#{@guess_counter} turns left... Try again!"
+      puts "#{@guess_counter} turns left... Try again!\n\n"
     else
-      puts "#{@guess_counter} turns left... Game over!"
+      puts "#{@guess_counter} turns left... Game over!\n"
     end
   end
 
@@ -65,7 +64,7 @@ class Board
   end
 
   def generate_secret_code #will need to be expanded when want to reverse computer/human roles
-    @board_array[0].map! { |n| n = @colors.sample }
+    @board_array[0].map! { @colors.sample }
   end
 
   def valid_guess?(guess_array)
@@ -79,7 +78,7 @@ class Board
 
   def display_last_guess
     puts 'Your last valid guess was:'
-    puts @board_array[@row_for_guess]
+    puts @board_array[@row_for_guess].join('-') # puts with an Array will output everything on separate lines, use join
   end
 
   def reset_match_calculators
@@ -133,7 +132,7 @@ class Board
     if @exact_match_count == 4
       puts "\nCongrats - you cracked the code!\n"
     else
-      puts "#{@exact_match_count} exact matches and #{@color_only_match_count} other color only matches"
+      puts "\n#{@exact_match_count} exact matches and #{@color_only_match_count} other color only matches"
     end
   end
     # while @remaining_guess_indices.length > 0
@@ -154,13 +153,15 @@ class Player
     @board = board
     if valid_player_type?(player_type)
       @player_type = player_type
-    else 
-      "Please retry with valid player types(s): 'human' or 'computer'" # 'human' or 'computer'
+    else  
+      # WILL NEED TO BE UPDATED IF PLAYER ROLES AREN'T BEING HARDCODED AND BECOME AN INPUT OPTION
+      # THE ELSE IS NOT CURRENTLY HANDLED CORRECTLY AND GAMEPLAY WILL CONTINUE
+      puts "Please retry with valid player types(s): 'human' or 'computer'" # 'human' or 'computer'
     end
   end
 
   def valid_player_type?(type)
-    ['human','computer'].include?(type.to_s.downcase)
+    %w[human computer].include?(type.to_s.downcase)
   end
 
   def guess_secret_code
@@ -197,3 +198,4 @@ game.play
 # multiline string example:
 #     puts 'choose four colors (green, blue, yellow, white, black, pink - duplicates OK)'\
 #     ' separated by spaces to guess the code:'
+# @board_array = Array.new(12) { Array.new(4) }  --> makes an array of 12 (sub)arrays of 4
