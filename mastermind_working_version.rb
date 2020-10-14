@@ -17,10 +17,6 @@ class Game
     @guess_counter = 12
   end
 
-  def reduce_remaining_guess_counter
-    self.guess_counter -= 1
-  end
-
   def display_number_of_remaining_turns
     if @guess_counter > 0 
       puts "#{@guess_counter} turns left... Try again!\n\n"
